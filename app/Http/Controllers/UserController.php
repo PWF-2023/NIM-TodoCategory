@@ -11,7 +11,7 @@ class UserController extends Controller
     {
         $search = request('search');
         if ($search) {
-            $users = User::where(function ($query) use ($search) {
+            $users = User::with('todos')->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('email', 'like', '%' . $search . '%');
             })
