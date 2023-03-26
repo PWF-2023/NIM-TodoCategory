@@ -43,6 +43,6 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
     public function todos()
     {
-        return $this->hasMany(Todo::class);
+        return $this->hasMany(Todo::class, 'user_id', 'id');
     }
 }
