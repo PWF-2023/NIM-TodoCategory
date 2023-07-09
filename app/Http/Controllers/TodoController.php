@@ -6,6 +6,7 @@ use App\Models\Todo;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Rules\CategoryBelongToUser;
 
 class TodoController extends Controller
 {
@@ -32,9 +33,12 @@ class TodoController extends Controller
             'title' => 'required|max:255',
             'category_id' => [
                 'nullable',
-                Rule::exists('categories', 'id')->where(function ($query) {
-                    $query->where('user_id', auth()->user()->id);
-                })
+                // Use this if you want to use the Rule class
+                // Rule::exists('categories', 'id')->where(function ($query) {
+                //     $query->where('user_id', auth()->user()->id);
+                // })
+                // Use this if you want to use the Closure class (App\Rules\CategoryBelongToUser)
+                new CategoryBelongToUser(),
             ]
         ]);
 
@@ -80,9 +84,12 @@ class TodoController extends Controller
             'title' => 'required|max:255',
             'category_id' => [
                 'nullable',
-                Rule::exists('categories', 'id')->where(function ($query) {
-                    $query->where('user_id', auth()->user()->id);
-                })
+                // Use this if you want to use the Rule class
+                // Rule::exists('categories', 'id')->where(function ($query) {
+                //     $query->where('user_id', auth()->user()->id);
+                // })
+                // Use this if you want to use the Closure class (App\Rules\CategoryBelongToUser)
+                new CategoryBelongToUser(),
             ]
         ]);
 
