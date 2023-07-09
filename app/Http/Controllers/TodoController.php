@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TodoStoreRequest;
+use App\Http\Requests\TodoUpdateRequest;
 use App\Models\Todo;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -16,7 +18,6 @@ class TodoController extends Controller
             ->orderBy('is_complete', 'asc')
             ->orderBy('created_at', 'desc')
             ->get();
-        // dd($todos);
         $todosCompleted = Todo::where('user_id', auth()->user()->id)
             ->where('is_complete', true)
             ->count();
@@ -27,21 +28,8 @@ class TodoController extends Controller
         $categories = Category::where('user_id', auth()->user()->id)->get();
         return view('todo.create', compact('categories'));
     }
-    public function store(Request $request, Todo $todo)
+    public function store(TodoStoreRequest $request, Todo $todo)
     {
-        $request->validate([
-            'title' => 'required|max:255',
-            'category_id' => [
-                'nullable',
-                // Use this if you want to use the Rule class
-                // Rule::exists('categories', 'id')->where(function ($query) {
-                //     $query->where('user_id', auth()->user()->id);
-                // })
-                // Use this if you want to use the Closure class (App\Rules\CategoryBelongToUser)
-                new CategoryBelongToUser(),
-            ]
-        ]);
-
         // Practical
         // $todo = new Todo;
         // $todo->title = $request->title;
@@ -69,7 +57,6 @@ class TodoController extends Controller
     {
         $categories = Category::where('user_id', auth()->user()->id)->get();
         if (auth()->user()->id == $todo->user_id) {
-            // dd($todo);
             return view('todo.edit', compact('todo', 'categories'));
         } else {
             // abort(403);
@@ -78,21 +65,8 @@ class TodoController extends Controller
         }
     }
 
-    public function update(Request $request, Todo $todo)
+    public function update(TodoUpdateRequest $request, Todo $todo)
     {
-        $request->validate([
-            'title' => 'required|max:255',
-            'category_id' => [
-                'nullable',
-                // Use this if you want to use the Rule class
-                // Rule::exists('categories', 'id')->where(function ($query) {
-                //     $query->where('user_id', auth()->user()->id);
-                // })
-                // Use this if you want to use the Closure class (App\Rules\CategoryBelongToUser)
-                new CategoryBelongToUser(),
-            ]
-        ]);
-
         // Practical
         // $todo->title = $request->title;
         // $todo->save();
@@ -139,14 +113,12 @@ class TodoController extends Controller
     }
     public function destroyCompleted()
     {
-        // get all todos for current user where is_completed is true
         $todosCompleted = Todo::where('user_id', auth()->user()->id)
             ->where('is_complete', true)
             ->get();
         foreach ($todosCompleted as $todo) {
             $todo->delete();
         }
-        // dd($todosCompleted);
         return redirect()->route('todo.index')->with('success', 'All completed todos deleted successfully!');
     }
 }
